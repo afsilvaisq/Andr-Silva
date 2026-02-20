@@ -1,7 +1,0 @@
-{
-  "name": "ReliabilityTech Industrial",
-  "description": "A high-performance industrial maintenance reliability platform featuring real-time sensor monitoring, predictive analytics, and AI-driven maintenance insights using Gemini.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
