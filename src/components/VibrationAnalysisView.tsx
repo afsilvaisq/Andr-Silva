@@ -6,7 +6,7 @@ import { ref, onValue, limitToLast, query } from "firebase/database";
 import { db as database } from '../services/firebase';
 import { Activity, Waves, Clock, Database } from 'lucide-react';
 
-const VibrationAnalysisView: React.FC = () => {
+const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ const VibrationAnalysisView: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Cabeçalho da Secção */}
       <div>
-        <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">Análise de Vibração Industrial</h2>
+      <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">{assetName} - Análise Triaxial</h2>
         <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
           <Database size={12} className="text-indigo-600" />
           Dados Reais - Sensor WISE-2410
