@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import { ref, onValue, limitToLast, query } from "firebase/database";
 import { db as database } from '../services/firebase';
-import { Activity, Clock, AlertCircle, History } from 'lucide-react';
+import { Activity, Clock, History, AlertTriangle } from 'lucide-react';
 
 const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) => {
   const [data, setData] = useState<any[]>([]);
@@ -29,118 +29,118 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
     return () => unsubscribe();
   }, [assetName]);
 
-  // Filtra os últimos 5 eventos que ultrapassaram o limite de alerta (4.5)
+  // Histórico de Alertas: Filtra leituras acima de 4.5
   const alertHistory = useMemo(() => {
     return data
       .filter(d => d.x > 4.5 || d.y > 4.5 || d.z > 4.5)
-      .slice(-5)
+      .slice(-6)
       .reverse();
   }, [data]);
 
   const latest = data.length > 0 ? data[data.length - 1] : { x: 0, y: 0, z: 0 };
-  const getStatusColor = (val: number) => {
-    if (val > 7.1) return "text-red-500 animate-pulse";
-    if (val > 4.5) return "text-yellow-500";
-    return "text-emerald-500";
+
+  const getSeverityColor = (val: number) => {
+    if (val > 7.1) return "text-red-500 animate-pulse font-black"; // Crítico
+    if (val > 4.5) return "text-yellow-500 font-bold"; // Alerta
+    return "text-emerald-500"; // OK
   };
 
-  if (loading) return <div className=\"p-4 text-[10px] font-mono text-slate-500 uppercase tracking-widest\">Data Sync...</div>;
+  if (loading) return <div className="p-4 text-[10px] font-mono text-slate-500 animate-pulse uppercase">Syncing Stream...</div>;
 
   return (
-    <div className=\"w-full bg-transparent font-mono text-slate-400 p-2\">
+    <div className="w-full bg-transparent font-mono text-slate-400 p-2">
       
-      {/* Header Técnico */}
-      <div className=\"flex justify-between items-start mb-8 border-l-2 border-slate-800 pl-4\">
-        <div className=\"space-y-3\">
-          <h2 className=\"text-[10px] font-black text-white tracking-[0.4em] uppercase\">
-            {latest.tagName} // TELEMETRIA_SENSÓRICA
+      {/* Indicadores de Topo */}
+      <div className="flex justify-between items-start mb-8 border-l-2 border-slate-800 pl-4 py-1">
+        <div className="space-y-3">
+          <h2 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">
+            {latest.tagName} // TELEMETRY_TREND
           </h2>
-          <div className=\"flex gap-8\">
-             <MetricDisplay label=\"X_RADIAL\" value={latest.x} color={getStatusColor(latest.x)} />
-             <MetricDisplay label=\"Y_TANGENTIAL\" value={latest.y} color={getStatusColor(latest.y)} />
-             <MetricDisplay label=\"Z_AXIAL\" value={latest.z} color={getStatusColor(latest.z)} />
+          <div className="flex gap-8">
+             <MetricBox label="X_RADIAL" value={latest.x} color={getSeverityColor(latest.x)} />
+             <MetricBox label="Y_TANGENTIAL" value={latest.y} color={getSeverityColor(latest.y)} />
+             <MetricBox label="Z_AXIAL" value={latest.z} color={getSeverityColor(latest.z)} />
           </div>
         </div>
-        <div className=\"text-[9px] font-bold text-right\">
-          <p className=\"text-slate-500 mb-1 tracking-widest\">SISTEMA ATIVO</p>
-          <p className=\"text-white flex items-center justify-end gap-2\"><Clock size={10}/> {latest.time}</p>
+        <div className="text-[9px] font-bold text-right space-y-1">
+          <p className="text-white flex items-center justify-end gap-2"><Clock size={10}/> {latest.time}</p>
+          <p className="text-slate-600 tracking-tighter uppercase font-black">ISO_10816_Standard</p>
         </div>
       </div>
 
-      <div className=\"flex flex-col lg:flex-row gap-6\">
-        {/* Gráfico de Tendência (Trend) */}
-        <div className=\"flex-1 h-[450px] relative border border-slate-800/30 rounded-sm bg-slate-900/5\">
-          <ResponsiveContainer width=\"100%\" height=\"100%\">
-            <AreaChart data={data} margin={{ top: 10, right: 40, left: 10, bottom: 20 }}>
-              <CartesianGrid strokeDasharray=\"0\" vertical={true} stroke=\"#1e293b\" strokeOpacity={0.1} />
-              <XAxis dataKey=\"time\" axisLine={{stroke:'#1e293b'}} tick={{fontSize: 8, fill:'#475569'}} tickLine={false}>
-                <Label value=\"EIXO TEMPORAL\" offset={-12} position=\"insideBottom\" fill=\"#334155\" fontSize={7} fontWeight=\"bold\" />
-              </XAxis>
-              <YAxis axisLine={{stroke:'#1e293b'}} tick={{fontSize: 8, fill:'#475569'}} tickLine={false}>
-                <Label value=\"MAGNITUDE (MM/S)\" angle={-90} position=\"insideLeft\" offset={15} fill=\"#334155\" fontSize={7} fontWeight=\"bold\" />
+      <div className="flex flex-col xl:flex-row gap-6">
+        {/* Gráfico de Espectro */}
+        <div className="flex-1 h-[400px] border border-slate-800/20 bg-slate-900/5 rounded-sm relative">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="0" vertical={true} stroke="#1e293b" strokeOpacity={0.1} />
+              <XAxis dataKey="time" axisLine={{stroke:'#1e293b'}} tick={{fontSize: 8, fill:'#475569'}} tickLine={false} />
+              <YAxis axisLine={{stroke:'#1e293b'}} tick={{fontSize: 8, fill:'#475569'}} tickLine={false} domain={[0, 'auto']}>
+                <Label value="MAGNITUDE (MM/S)" angle={-90} position="insideLeft" offset={15} fill="#334155" fontSize={7} fontWeight="black" />
               </YAxis>
               
-              {/* Níveis de Alarme ISO 10816 */}
-              <ReferenceLine y={7.1} stroke=\"#ef4444\" strokeDasharray=\"3 3\" strokeWidth={1} />
-              <ReferenceLine y={4.5} stroke=\"#eab308\" strokeDasharray=\"3 3\" strokeWidth={1} />
+              {/* Linhas de Limite Crítico e Alerta */}
+              <ReferenceLine y={7.1} stroke="#ef4444" strokeDasharray="3 3" />
+              <ReferenceLine y={4.5} stroke="#eab308" strokeDasharray="3 3" />
 
-              <Area type=\"monotone\" dataKey=\"x\" stroke=\"#3b82f6\" strokeWidth={1.2} fill=\"transparent\" isAnimationActive={false} />
-              <Area type=\"monotone\" dataKey=\"y\" stroke=\"#ef4444\" strokeWidth={1.2} fill=\"transparent\" isAnimationActive={false} />
-              <Area type=\"monotone\" dataKey=\"z\" stroke=\"#22c55e\" strokeWidth={1.2} fill=\"transparent\" isAnimationActive={false} />
-              
+              <Area type="monotone" dataKey="x" stroke="#3b82f6" strokeWidth={1} fill="transparent" isAnimationActive={false} />
+              <Area type="monotone" dataKey="y" stroke="#ef4444" strokeWidth={1} fill="transparent" isAnimationActive={false} />
+              <Area type="monotone" dataKey="z" stroke="#22c55e" strokeWidth={1} fill="transparent" isAnimationActive={false} />
               <Tooltip contentStyle={{backgroundColor:'#000', border:'1px solid #1e293b', fontSize:'8px'}} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Tabela Lateral de Alarmes (Recent Events) */}
-        <div className=\"w-full lg:w-72 bg-slate-900/10 border border-slate-800/30 p-4 rounded-sm\">
-          <h3 className=\"text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2\">
-            <History size={12}/> Histórico de Alertas
+        {/* Tabela de Histórico Lateral */}
+        <div className="w-full xl:w-80 bg-slate-900/10 border border-slate-800/30 p-4 rounded-sm">
+          <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <History size={12}/> Log de Eventos ({alertHistory.length})
           </h3>
-          <div className=\"space-y-2\">
-            {alertHistory.length > 0 ? alertHistory.map((event, i) => (
-              <div key={i} className=\"border-b border-slate-800/50 pb-2 flex justify-between items-center\">
-                <div>
-                  <p className=\"text-[8px] text-slate-500 font-bold\">{event.time}</p>
-                  <p className=\"text-[10px] text-white font-bold tracking-tighter italic uppercase\">Excessive_Vib</p>
+          <div className="space-y-3">
+            {alertHistory.length > 0 ? alertHistory.map((item, i) => (
+              <div key={i} className="flex items-center justify-between border-b border-slate-800/30 pb-2">
+                <div className="flex flex-col">
+                  <span className="text-[8px] text-slate-600 font-bold">{item.time}</span>
+                  <span className="text-[10px] text-white font-black italic">VIB_ALERT_OVER</span>
                 </div>
-                <div className=\"text-right\">
-                  <span className={`text-[10px] font-bold ${event.x > 7.1 || event.y > 7.1 || event.z > 7.1 ? 'text-red-500' : 'text-yellow-500'}`}>
-                    {Math.max(event.x, event.y, event.z).toFixed(2)}
+                <div className="text-right">
+                  <span className={`text-[11px] font-bold ${Math.max(item.x, item.y, item.z) > 7.1 ? 'text-red-500 pulse' : 'text-yellow-500'}`}>
+                    {Math.max(item.x, item.y, item.z).toFixed(2)}
                   </span>
-                  <p className=\"text-[7px] text-slate-600\">mm/s</p>
+                  <span className="text-[7px] text-slate-700 ml-1">mm/s</span>
                 </div>
               </div>
             )) : (
-              <p className=\"text-[8px] text-slate-700 italic\">Nenhum alerta registado...</p>
+              <div className="py-10 text-center">
+                <p className="text-[8px] text-slate-700 uppercase tracking-widest italic font-bold">Sem anomalias detetadas</p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Footer Industrial */}
-      <div className=\"mt-8 flex justify-between items-center text-[8px] font-black text-slate-700 tracking-[0.2em] uppercase\">
-        <div className=\"flex gap-6\">
-          <span className=\"flex items-center gap-2\"><div className=\"w-2 h-2 rounded-full bg-blue-500\"/> X_RADIAL</span>
-          <span className=\"flex items-center gap-2\"><div className=\"w-2 h-2 rounded-full bg-red-500\"/> Y_TANGENTIAL</span>
-          <span className=\"flex items-center gap-2\"><div className=\"w-2 h-2 rounded-full bg-green-500\"/> Z_AXIAL</span>
+      {/* Legenda Estilo Terminal */}
+      <div className="mt-8 flex justify-between items-center text-[8px] font-black text-slate-700 tracking-widest uppercase">
+        <div className="flex gap-6">
+          <span className="flex items-center gap-2"><div className="w-2 h-[1px] bg-blue-500"/> X_RAD</span>
+          <span className="flex items-center gap-2"><div className="w-2 h-[1px] bg-red-500"/> Y_TAN</span>
+          <span className="flex items-center gap-2"><div className="w-2 h-[1px] bg-green-500"/> Z_AXI</span>
         </div>
-        <div className=\"flex items-center gap-2\">
-          <Activity size={10} className=\"text-emerald-900\" />
-          SISTEMA_VIB_OK // ISO_10816_STANDARDS
+        <div className="flex items-center gap-2">
+          <Activity size={10} className={latest.x > 4.5 ? "text-yellow-500 animate-bounce" : "text-emerald-900"} />
+          STREAMING_ACTIVE // SECURE_LINK
         </div>
       </div>
     </div>
   );
 };
 
-const MetricDisplay = ({ label, value, color }: any) => (
-  <div className=\"flex flex-col\">
-    <span className=\"text-[7px] text-slate-600 font-black tracking-tighter mb-1 uppercase\">{label}</span>
-    <div className=\"flex items-baseline gap-1\">
-      <span className={`text-sm font-bold tracking-tighter ${color}`}>{value?.toFixed(3)}</span>
-      <span className=\"text-[8px] text-slate-800 font-bold\">mm/s</span>
+const MetricBox = ({ label, value, color }: any) => (
+  <div className="flex flex-col">
+    <span className="text-[7px] text-slate-600 font-black tracking-tighter mb-1 uppercase italic">{label}</span>
+    <div className="flex items-baseline gap-1">
+      <span className={`text-sm font-bold tabular-nums ${color}`}>{value?.toFixed(3)}</span>
+      <span className="text-[8px] text-slate-800 font-black">MM/S</span>
     </div>
   </div>
 );
