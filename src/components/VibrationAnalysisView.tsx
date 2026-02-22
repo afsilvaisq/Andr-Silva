@@ -22,7 +22,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
   x: result[key].vib_X,
   y: result[key].vib_Y,
   z: result[key].vib_Z,
-  tagName: result[key].tag, // Adicione isto se o Node-RED estiver a enviar a tag
+  tagName: result[key].tag || 'Sem TAG',
   fullDate: new Date(result[key].timestamp).toLocaleString()
 }));
         setData(formattedData);
