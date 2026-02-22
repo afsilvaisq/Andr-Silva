@@ -417,7 +417,7 @@ const App: React.FC = () => {
         {view === 'kpi' && <section className="p-8"><KPIView assets={assets} /></section>}
         {view === 'ml' && <section className="p-8"><MLAnalyticsView assets={assets} /></section>}
         {view === 'live' && <section className="p-8"><LiveMonitoringView assets={assets} /></section>}
-        {view === 'vibration-iot' && <section className="p-8"><VibrationAnalysisView /></section>}
+        {view === 'vibration-iot' && (<section className="p-8"><VibrationAnalysisView assetName={selectedAsset?.name || 'Equipamento'} /></section>)}
         {view === 'lubrication' && <section className="p-8"><LubricationView assets={assets} onUpdateAsset={handleUpdateAsset} /></section>}
         {view === 'rdi' && <section className="p-8"><RDIView assets={assets} /></section>}
         {view === 'thermography' && <section className="p-8"><ThermographyView assets={assets} onUpdateAsset={handleUpdateAsset} /></section>}
