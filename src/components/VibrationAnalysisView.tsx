@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceLine
 } from 'recharts';
 import { ref, onValue, limitToLast, query } from "firebase/database";
 import { db as database } from '../services/firebase';
-import { Activity, Clock } from 'lucide-react';
+import { Activity, Clock, AlertTriangle } from 'lucide-react';
 
 const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) => {
   const [data, setData] = useState<any[]>([]);
@@ -20,7 +20,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
           x: result[key].vib_X || 0,
           y: result[key].vib_Y || 0,
           z: result[key].vib_Z || 0,
-          tagName: result[key].tag || assetName || 'SENSOR_01',
+          tagName: result[key].tag || assetName || 'NODE_01',
         }));
         setData(formattedData);
       }
@@ -30,117 +30,116 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
   }, [assetName]);
 
   const latest = data.length > 0 ? data[data.length - 1] : { x: 0, y: 0, z: 0 };
+  
+  // Lógica de Alerta Crítico
+  const isCritical = latest.x > 4.5 || latest.y > 4.5 || latest.z > 4.5;
 
-  if (loading) return <div className="p-4 text-[10px] font-mono text-slate-500 animate-pulse">INIT_STREAM...</div>;
+  if (loading) return <div className="p-4 text-[10px] font-mono text-slate-500 uppercase tracking-widest animate-pulse">Sincronizando Barramento...</div>;
 
   return (
-    <div className="w-full bg-transparent text-slate-400 font-mono selection:bg-indigo-500/30">
+    <div className="w-full bg-transparent font-mono text-slate-400 p-2">
       
-      {/* Header Técnico Compacto */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-l-2 border-indigo-500 pl-4">
-        <div>
-          <h2 className="text-xs font-black text-white uppercase tracking-[0.3em]">{latest.tagName} // TELEMETRIA TRIAXIAL</h2>
-          <p className="text-[9px] text-slate-500 mt-1 uppercase">Monitorização de condição em tempo real via RTDB</p>
+      {/* Indicadores de Telemetria Superior */}
+      <div className="flex justify-between items-start mb-6 border-l-2 border-slate-800 pl-4 py-1">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <h2 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">
+              {latest.tagName} // REALTIME_TREND
+            </h2>
+            {isCritical && (
+              <div className="flex items-center gap-1 text-[9px] font-bold text-red-500 animate-pulse bg-red-500/10 px-2 py-0.5 rounded">
+                <AlertTriangle size={10} /> CRITICAL_ALERT
+              </div>
+            )}
+          </div>
+          <div className="flex gap-6">
+             <MetricPoint label="X_RADIAL" value={latest.x} color={latest.x > 4.5 ? "text-red-500 animate-pulse" : "text-blue-500"} />
+             <MetricPoint label="Y_TANGENTIAL" value={latest.y} color={latest.y > 4.5 ? "text-red-500 animate-pulse" : "text-red-500"} />
+             <MetricPoint label="Z_AXIAL" value={latest.z} color={latest.z > 4.5 ? "text-red-500 animate-pulse" : "text-green-500"} />
+          </div>
         </div>
-        <div className="mt-4 md:mt-0 flex gap-6">
-          <TechnicalStat label="X_RADIAL" value={latest.x} color="text-blue-500" />
-          <TechnicalStat label="Y_TANGENTIAL" value={latest.y} color="text-red-500" />
-          <TechnicalStat label="Z_AXIAL" value={latest.z} color="text-green-500" />
+        <div className="text-[9px] text-slate-600 font-bold uppercase text-right space-y-1">
+          <p className="flex items-center justify-end gap-2">
+            <Clock size={10} /> {latest.time || '--:--:--'}
+          </p>
+          <p className={isCritical ? "text-red-500 animate-pulse" : "text-emerald-900"}>● LIVE_STREAM</p>
         </div>
       </div>
 
-      {/* Contentor do Gráfico Transparente */}
-      <div className="relative h-[450px] w-full border border-slate-800/40 bg-slate-900/5 rounded-sm p-2">
-        {/* Label do Eixo Y */}
-        <div className="absolute left-2 top-4 flex items-center gap-2 transform -rotate-90 origin-left translate-y-20">
-          <span className="text-[8px] font-bold tracking-widest text-slate-600 uppercase">Magnitude (mm/s RMS)</span>
-        </div>
-
+      {/* Contentor do Gráfico de Tendência */}
+      <div className="h-[400px] w-full relative border border-slate-800/20 rounded-sm">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 20, right: 10, left: 20, bottom: 20 }}>
+          <AreaChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
             <defs>
-              <linearGradient id="lineX" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+              <linearGradient id="gX" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.05}/>
                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
               </linearGradient>
-              <linearGradient id="lineY" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
+              <linearGradient id="gY" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.05}/>
                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
               </linearGradient>
-              <linearGradient id="lineZ" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1}/>
+              <linearGradient id="gZ" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.05}/>
                 <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
               </linearGradient>
             </defs>
             
-            <CartesianGrid strokeDasharray="0" vertical={true} stroke="#1e293b" strokeOpacity={0.3} />
+            <CartesianGrid strokeDasharray="0" vertical={true} stroke="#1e293b" strokeOpacity={0.1} />
             
-            <XAxis 
-              dataKey="time" 
-              stroke="#475569" 
-              fontSize={9} 
-              tickLine={false} 
-              axisLine={false}
-              label={{ value: 'Eixo Temporal (hh:mm:ss)', position: 'bottom', offset: 0, fontSize: 8, fill: '#64748b' }}
-            />
+            <XAxis dataKey="time" axisLine={{ stroke: '#1e293b' }} tickLine={false} tick={{ fontSize: 8, fill: '#475569' }}>
+              <Label value="TEMPO (HH:MM:SS)" offset={-12} position="insideBottom" fill="#334155" fontSize={7} fontWeight="bold" />
+            </XAxis>
             
-            <YAxis 
-              stroke="#475569" 
-              fontSize={9} 
-              tickLine={false} 
-              axisLine={false} 
-              domain={[0, 'auto']}
-            />
+            <YAxis axisLine={{ stroke: '#1e293b' }} tickLine={false} tick={{ fontSize: 8, fill: '#475569' }} domain={[0, 'auto']}>
+              <Label value="MAGNITUDE (MM/S)" angle={-90} position="insideLeft" offset={15} fill="#334155" fontSize={7} fontWeight="bold" />
+            </YAxis>
 
             <Tooltip 
-              contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', fontSize: '9px', borderRadius: '2px' }}
-              cursor={{ stroke: '#334155', strokeWidth: 1 }}
+              contentStyle={{ backgroundColor: '#000', border: '1px solid #1e293b', fontSize: '8px', borderRadius: '0px' }}
+              cursor={{ stroke: '#1e293b', strokeWidth: 1 }}
             />
 
-            {/* Linhas de Alerta Estilo Imagem */}
-            <ReferenceLine y={4.5} label={{ position: 'right', value: 'CRÍTICO', fill: '#ef4444', fontSize: 7, fontWeight: 'bold' }} stroke="#ef4444" strokeDasharray="3 3" />
-            <ReferenceLine y={2.8} label={{ position: 'right', value: 'ALERTA', fill: '#f59e0b', fontSize: 7, fontWeight: 'bold' }} stroke="#f59e0b" strokeDasharray="3 3" />
+            <ReferenceLine y={4.5} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.5}>
+              <Label value="LIMITE_CRÍTICO" position="right" fill="#ef4444" fontSize={7} />
+            </ReferenceLine>
 
-            {/* Linhas de Tendência Triaxial */}
-            <Area type="monotone" dataKey="x" stroke="#3b82f6" strokeWidth={1.2} fill="url(#lineX)" isAnimationActive={false} />
-            <Area type="monotone" dataKey="y" stroke="#ef4444" strokeWidth={1.2} fill="url(#lineY)" isAnimationActive={false} />
-            <Area type="monotone" dataKey="z" stroke="#22c55e" strokeWidth={1.2} fill="url(#lineZ)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="x" stroke="#3b82f6" strokeWidth={1} fill="url(#gX)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="y" stroke="#ef4444" strokeWidth={1} fill="url(#gY)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="z" stroke="#22c55e" strokeWidth={1} fill="url(#gZ)" isAnimationActive={false} />
           </AreaChart>
         </ResponsiveContainer>
-
-        {/* Legenda Manual Estilo Dark */}
-        <div className="absolute bottom-4 right-8 flex gap-4">
-          <LegendItem color="bg-blue-500" label="Radial_X" />
-          <LegendItem color="bg-red-500" label="Tangential_Y" />
-          <LegendItem color="bg-green-500" label="Axial_Z" />
-        </div>
       </div>
 
-      <div className="mt-4 flex justify-between items-center text-[8px] text-slate-600 tracking-widest uppercase font-bold">
-        <div className="flex items-center gap-2">
-          <Activity size={10} className="text-emerald-500" />
-          Sistema Ativo // Frequência Amostragem: Variável
+      {/* Legenda Estilo Engenharia Inferior */}
+      <div className="flex justify-between items-center mt-6 text-[8px] font-bold text-slate-700 tracking-widest uppercase">
+        <div className="flex gap-4">
+          <LegendMark color="bg-blue-500" label="X_RADIAL" />
+          <LegendMark color="bg-red-500" label="Y_TANGENTIAL" />
+          <LegendMark color="bg-green-500" label="Z_AXIAL" />
         </div>
-        <div>UUID: {latest.tagName}_TX_01</div>
+        <div className="flex items-center gap-2">
+          <Activity size={10} className={isCritical ? "text-red-500 animate-ping" : "text-emerald-900"} />
+          SISTEMA_VIB_OK // ISO_10816
+        </div>
       </div>
     </div>
   );
 };
 
-const TechnicalStat = ({ label, value, color }: any) => (
-  <div className="flex flex-col items-end">
-    <span className="text-[8px] text-slate-600 font-bold tracking-tighter mb-1">{label}</span>
-    <div className="flex items-baseline gap-1">
-      <span className={`text-lg font-mono font-bold tracking-tighter ${color}`}>{value.toFixed(3)}</span>
-      <span className="text-[8px] text-slate-700">mm/s</span>
-    </div>
+const MetricPoint = ({ label, value, color }: any) => (
+  <div className="flex flex-col">
+    <span className="text-[7px] text-slate-600 font-black mb-1 tracking-tighter uppercase">{label}</span>
+    <span className={`text-sm font-bold tabular-nums tracking-tighter ${color}`}>
+      {value?.toFixed(3)} <span className="text-[8px] opacity-30 font-normal">mm/s</span>
+    </span>
   </div>
 );
 
-const LegendItem = ({ color, label }: any) => (
+const LegendMark = ({ color, label }: any) => (
   <div className="flex items-center gap-2">
     <div className={`w-2 h-[2px] ${color}`} />
-    <span className="text-[8px] font-bold text-slate-500 uppercase">{label}</span>
+    <span>{label}</span>
   </div>
 );
 
