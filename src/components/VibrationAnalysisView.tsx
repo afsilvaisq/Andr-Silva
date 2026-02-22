@@ -68,15 +68,42 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="time" 
-                tick={{fill: '#94a3b8', fontSize: 10}} 
-                axisLine={false}
-                tickLine={false}
+              <XAxis dataKey="time" hide />
+              <YAxis hide domain={['auto', 'auto']} />
+              <Tooltip 
+                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                labelStyle={{ display: 'none' }}
               />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
+              <Legend verticalAlign="top" align="right" iconType="circle" />
+              
+              <Line 
+                type="monotone" 
+                dataKey="x" 
+                name="Eixo X" 
+                stroke="#3b82f6"  /* Azul */
+                strokeWidth={2} 
+                dot={false} 
+                activeDot={{ r: 4 }} 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="y" 
+                name="Eixo Y" 
+                stroke="#ef4444"  /* Vermelho */
+                strokeWidth={2} 
+                dot={false} 
+                activeDot={{ r: 4 }} 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="z" 
+                name="Eixo Z" 
+                stroke="#22c55e"  /* Verde */
+                strokeWidth={2} 
+                dot={false} 
+                activeDot={{ r: 4 }} 
+              />
+            </LineChart>
                 tick={{fill: '#94a3b8', fontSize: 10}}
                 label={{ value: 'mm/s', angle: -90, position: 'insideLeft', style: {fontSize: '10px', fill: '#94a3b8'} }}
               />
