@@ -22,7 +22,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
   x: result[key].vib_X,
   y: result[key].vib_Y,
   z: result[key].vib_Z,
-  tagName: result[key].tag || 'Sem TAG',
+  tagName: result[key].tag || 'Sem TAG', // Lê a tag enviada pelo sensor
   fullDate: new Date(result[key].timestamp).toLocaleString()
 }));
         setData(formattedData);
