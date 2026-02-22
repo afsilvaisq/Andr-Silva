@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area 
 } from 'recharts';
 import { ref, onValue, limitToLast, query } from "firebase/database";
-import { database } from '../services/firebaseConfig';
+import { db as database } from '../services/firebase';
 import { Activity, Waves, Clock, Database } from 'lucide-react';
 
 const VibrationAnalysisView: React.FC = () => {
