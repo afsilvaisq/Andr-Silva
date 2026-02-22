@@ -39,17 +39,16 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Cabeçalho da Secção */}
     <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-  <div>
-    <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
-      {/* Aqui usamos assetName se o Firebase ainda não tiver enviado a tag */}
-      {latest?.tagName || assetName || 'Equipamento'} - Análise Triaxial
-    </h2>
-    <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
-      <Activity size={12} className="text-indigo-600 animate-pulse" />
-      Monitorização Live
-    </p>
-  </div>
-</div>
+        <div>
+          <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
+            {latest?.tagName || assetName || 'Equipamento'} - Live
+          </h2>
+          <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
+            <Activity size={12} className="text-indigo-600 animate-pulse" />
+            Monitorização em Tempo Real
+          </p>
+        </div>
+      </div>
 
       {/* Cards de Resumo em Tempo Real */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
