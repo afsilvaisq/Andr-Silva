@@ -1,4 +1,5 @@
 
+import VibrationAnalysisView from './components/VibrationAnalysisView';
 import React, { useState, useEffect, useMemo } from 'react';
 import { Asset, SensorType, UserRole, SensorReading, SeverityLevel, Sensor, DataSource } from './types';
 import AssetCard from './components/AssetCard';
