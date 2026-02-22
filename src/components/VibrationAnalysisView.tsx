@@ -58,12 +58,6 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
             <Waves size={16} className="text-indigo-600" />
             Linha de Tendência Triaxial
           </h3>
-<div className="flex flex-col gap-1">
-  <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
-    {latest.tagName || assetName}
-  </h2>
-  {/* Aqui já não existe o badge verde nem o texto "Live do Firebase" */}
-</div>
         <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
