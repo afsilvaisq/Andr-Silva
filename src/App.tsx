@@ -118,7 +118,7 @@ const App: React.FC = () => {
   const [showGateway, setShowGateway] = useState(false);
   const [showCSIImport, setShowCSIImport] = useState(false);
   const [showAddAsset, setShowAddAsset] = useState(false);
-  const [view, setView] = useState<'dashboard' | 'kpi' | 'criticality' | 'matrix' | 'live' | 'reports' | 'balancing' | 'integrations' | 'dimensional' | 'alignment' | 'rdi' | 'thermography' | 'rca' | 'ml' | 'lubrication'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'kpi' | 'criticality' | 'matrix' | 'live' | 'reports' | 'balancing' | 'integrations' | 'dimensional' | 'alignment' | 'rdi' | 'thermography' | 'rca' | 'ml' | 'lubrication' | 'vibration-iot'>('dashboard');
 
   useEffect(() => {
     const assetsRef = ref(db, 'assets');
@@ -338,6 +338,7 @@ const App: React.FC = () => {
           <SidebarItem icon={<BarChart3 />} label="KPIs" active={view === 'kpi'} sidebarOpen={sidebarOpen} onClick={() => setView('kpi')} />
           <SidebarItem icon={<BrainCircuit />} label="ML Analytics" active={view === 'ml'} sidebarOpen={sidebarOpen} onClick={() => setView('ml')} />
           <SidebarItem icon={<Waves />} label="Live Monitoring" active={view === 'live'} sidebarOpen={sidebarOpen} onClick={() => setView('live')} />
+          <SidebarItem icon={<Activity />} label="Vibração IoT" active={view === 'vibration-iot'} sidebarOpen={sidebarOpen} onClick={() => setView('vibration-iot')} />
           <SidebarItem icon={<Droplets />} label="Lubrificação" active={view === 'lubrication'} sidebarOpen={sidebarOpen} onClick={() => setView('lubrication')} />
           <SidebarItem icon={<Video />} label="Motion RDI" active={view === 'rdi'} sidebarOpen={sidebarOpen} onClick={() => setView('rdi')} />
           <SidebarItem icon={<Thermometer />} label="Termografia" active={view === 'thermography'} sidebarOpen={sidebarOpen} onClick={() => setView('thermography')} />
@@ -416,6 +417,7 @@ const App: React.FC = () => {
           {view === 'kpi' && <section className="p-8"><KPIView assets={assets} /></section>}
           {view === 'ml' && <section className="p-8"><MLAnalyticsView assets={assets} /></section>}
           {view === 'live' && <section className="p-8"><LiveMonitoringView assets={assets} /></section>}
+          {view === 'vibration-iot' && <section className="p-8"><VibrationAnalysisView /></section>}
           {view === 'lubrication' && <section className="p-8"><LubricationView assets={assets} onUpdateAsset={handleUpdateAsset} /></section>}
           {view === 'rdi' && <section className="p-8"><RDIView assets={assets} /></section>}
           {view === 'thermography' && <section className="p-8"><ThermographyView assets={assets} onUpdateAsset={handleUpdateAsset} /></section>}
