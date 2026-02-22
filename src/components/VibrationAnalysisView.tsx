@@ -18,13 +18,13 @@ const VibrationAnalysisView: React.FC = () => {
       const result = snapshot.val();
       if (result) {
         const formattedData = Object.keys(result).map(key => ({
-          // Formata a hora para o gráfico
-          time: new Date(result[key].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          x: result[key].vib_X,
-          y: result[key].vib_Y,
-          z: result[key].vib_Z,
-          fullDate: new Date(result[key].timestamp).toLocaleString()
-        }));
+  time: new Date(result[key].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  x: result[key].vib_X,
+  y: result[key].vib_Y,
+  z: result[key].vib_Z,
+  tagName: result[key].tag, // Adicione isto se o Node-RED estiver a enviar a tag
+  fullDate: new Date(result[key].timestamp).toLocaleString()
+}));
         setData(formattedData);
       }
       setLoading(false);
