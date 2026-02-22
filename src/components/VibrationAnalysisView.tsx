@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { ref, onValue, limitToLast, query } from "firebase/database";
 import { db as database } from '../services/firebase';
-import { Activity, Clock, Cpu, BarChart3 } from 'lucide-react';
+import { Activity, Clock } from 'lucide-react';
 
 const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) => {
   const [data, setData] = useState<any[]>([]);
@@ -20,8 +20,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
           x: result[key].vib_X || 0,
           y: result[key].vib_Y || 0,
           z: result[key].vib_Z || 0,
-          tagName: result[key].tag || assetName || 'ATV-01',
-          fullDate: new Date(result[key].timestamp).toLocaleString()
+          tagName: result[key].tag || assetName || 'SENSOR_01',
         }));
         setData(formattedData);
       }
@@ -32,110 +31,116 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
 
   const latest = data.length > 0 ? data[data.length - 1] : { x: 0, y: 0, z: 0 };
 
-  if (loading) return <div className="p-10 text-[10px] text-slate-500 font-mono tracking-widest">LOADING_DATA_STREAM...</div>;
+  if (loading) return <div className="p-4 text-[10px] font-mono text-slate-500 animate-pulse">INIT_STREAM...</div>;
 
   return (
-    <div className="min-h-screen bg-[#0b0e14] text-slate-300 p-4 font-sans selection:bg-indigo-500/30">
+    <div className="w-full bg-transparent text-slate-400 font-mono selection:bg-indigo-500/30">
       
-      {/* Top Bar - Ultra Compacta */}
-      <div className="flex justify-between items-center mb-6 border-b border-slate-800/50 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-500/10 rounded border border-indigo-500/20">
-            <Cpu size={16} className="text-indigo-400" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white tracking-tight uppercase">{latest.tagName}</h2>
-            <p className="text-[9px] text-slate-500 font-mono uppercase tracking-tighter">Triaxial Analysis // Real-time</p>
-          </div>
+      {/* Header Técnico Compacto */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-l-2 border-indigo-500 pl-4">
+        <div>
+          <h2 className="text-xs font-black text-white uppercase tracking-[0.3em]">{latest.tagName} // TELEMETRIA TRIAXIAL</h2>
+          <p className="text-[9px] text-slate-500 mt-1 uppercase">Monitorização de condição em tempo real via RTDB</p>
         </div>
-        <div className="flex gap-4">
-          <StatusItem label="Status" value="Online" color="text-emerald-500" />
-          <StatusItem label="Last Sync" value={latest.time} />
+        <div className="mt-4 md:mt-0 flex gap-6">
+          <TechnicalStat label="X_RADIAL" value={latest.x} color="text-blue-500" />
+          <TechnicalStat label="Y_TANGENTIAL" value={latest.y} color="text-red-500" />
+          <TechnicalStat label="Z_AXIAL" value={latest.z} color="text-green-500" />
         </div>
       </div>
 
-      {/* Mini Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <CompactMetric axis="X" value={latest.x} color="#3b82f6" label="Radial" />
-        <CompactMetric axis="Y" value={latest.y} color="#ef4444" label="Tangential" />
-        <CompactMetric axis="Z" value={latest.z} color="#22c55e" label="Axial" />
+      {/* Contentor do Gráfico Transparente */}
+      <div className="relative h-[450px] w-full border border-slate-800/40 bg-slate-900/5 rounded-sm p-2">
+        {/* Label do Eixo Y */}
+        <div className="absolute left-2 top-4 flex items-center gap-2 transform -rotate-90 origin-left translate-y-20">
+          <span className="text-[8px] font-bold tracking-widest text-slate-600 uppercase">Magnitude (mm/s RMS)</span>
+        </div>
+
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 20, right: 10, left: 20, bottom: 20 }}>
+            <defs>
+              <linearGradient id="lineX" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="lineY" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="lineZ" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            
+            <CartesianGrid strokeDasharray="0" vertical={true} stroke="#1e293b" strokeOpacity={0.3} />
+            
+            <XAxis 
+              dataKey="time" 
+              stroke="#475569" 
+              fontSize={9} 
+              tickLine={false} 
+              axisLine={false}
+              label={{ value: 'Eixo Temporal (hh:mm:ss)', position: 'bottom', offset: 0, fontSize: 8, fill: '#64748b' }}
+            />
+            
+            <YAxis 
+              stroke="#475569" 
+              fontSize={9} 
+              tickLine={false} 
+              axisLine={false} 
+              domain={[0, 'auto']}
+            />
+
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', fontSize: '9px', borderRadius: '2px' }}
+              cursor={{ stroke: '#334155', strokeWidth: 1 }}
+            />
+
+            {/* Linhas de Alerta Estilo Imagem */}
+            <ReferenceLine y={4.5} label={{ position: 'right', value: 'CRÍTICO', fill: '#ef4444', fontSize: 7, fontWeight: 'bold' }} stroke="#ef4444" strokeDasharray="3 3" />
+            <ReferenceLine y={2.8} label={{ position: 'right', value: 'ALERTA', fill: '#f59e0b', fontSize: 7, fontWeight: 'bold' }} stroke="#f59e0b" strokeDasharray="3 3" />
+
+            {/* Linhas de Tendência Triaxial */}
+            <Area type="monotone" dataKey="x" stroke="#3b82f6" strokeWidth={1.2} fill="url(#lineX)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="y" stroke="#ef4444" strokeWidth={1.2} fill="url(#lineY)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="z" stroke="#22c55e" strokeWidth={1.2} fill="url(#lineZ)" isAnimationActive={false} />
+          </AreaChart>
+        </ResponsiveContainer>
+
+        {/* Legenda Manual Estilo Dark */}
+        <div className="absolute bottom-4 right-8 flex gap-4">
+          <LegendItem color="bg-blue-500" label="Radial_X" />
+          <LegendItem color="bg-red-500" label="Tangential_Y" />
+          <LegendItem color="bg-green-500" label="Axial_Z" />
+        </div>
       </div>
 
-      {/* Gráfico Estilo Engenharia */}
-      <div className="bg-[#11151c] border border-slate-800 rounded-lg p-4 shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <BarChart3 size={14} className="text-slate-500" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Vibration Spectrum (mm/s RMS)</span>
-          </div>
-          <div className="flex gap-3 text-[9px] font-mono">
-            <LegendTag color="#3b82f6" label="X-Radial" />
-            <LegendTag color="#ef4444" label="Y-Tangential" />
-            <LegendTag color="#22c55e" label="Z-Axial" />
-          </div>
+      <div className="mt-4 flex justify-between items-center text-[8px] text-slate-600 tracking-widest uppercase font-bold">
+        <div className="flex items-center gap-2">
+          <Activity size={10} className="text-emerald-500" />
+          Sistema Ativo // Frequência Amostragem: Variável
         </div>
-
-        <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
-              <defs>
-                <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="0" vertical={true} stroke="#1e293b" strokeOpacity={0.5} />
-              <XAxis dataKey="time" hide />
-              <YAxis tick={{fontSize: 9, fill: '#475569'}} axisLine={false} tickLine={false} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#11151c', border: '1px solid #334155', borderRadius: '4px', fontSize: '10px' }}
-                itemStyle={{ padding: '0px' }}
-              />
-              <Area type="monotone" dataKey="x" stroke="#3b82f6" strokeWidth={1.5} fill="url(#blue)" animationDuration={500} isAnimationActive={false} />
-              <Area type="monotone" dataKey="y" stroke="#ef4444" strokeWidth={1.5} fill="url(#red)" animationDuration={500} isAnimationActive={false} />
-              <Area type="monotone" dataKey="z" stroke="#22c55e" strokeWidth={1.5} fill="url(#green)" animationDuration={500} isAnimationActive={false} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <div>UUID: {latest.tagName}_TX_01</div>
       </div>
     </div>
   );
 };
 
-const CompactMetric = ({ axis, value, color, label }: any) => (
-  <div className="bg-[#11151c] border border-slate-800 p-3 rounded flex justify-between items-center hover:border-slate-700 transition-colors">
-    <div>
-      <p className="text-[9px] font-mono text-slate-500 uppercase">{label}</p>
-      <h3 className="text-xs font-bold text-white">Axis {axis}</h3>
-    </div>
-    <div className="text-right">
-      <span className="text-xl font-mono font-bold tracking-tighter" style={{ color }}>
-        {value?.toFixed(3)}
-      </span>
-      <span className="text-[8px] ml-1 text-slate-600 uppercase font-bold">mm/s</span>
+const TechnicalStat = ({ label, value, color }: any) => (
+  <div className="flex flex-col items-end">
+    <span className="text-[8px] text-slate-600 font-bold tracking-tighter mb-1">{label}</span>
+    <div className="flex items-baseline gap-1">
+      <span className={`text-lg font-mono font-bold tracking-tighter ${color}`}>{value.toFixed(3)}</span>
+      <span className="text-[8px] text-slate-700">mm/s</span>
     </div>
   </div>
 );
 
-const StatusItem = ({ label, value, color = "text-slate-400" }: any) => (
-  <div className="text-right">
-    <p className="text-[8px] uppercase text-slate-600 font-bold tracking-tighter">{label}</p>
-    <p className={`text-[10px] font-mono font-bold ${color}`}>{value}</p>
-  </div>
-);
-
-const LegendTag = ({ color, label }: any) => (
-  <div className="flex items-center gap-1.5">
-    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-    <span className="text-slate-500 uppercase tracking-tighter">{label}</span>
+const LegendItem = ({ color, label }: any) => (
+  <div className="flex items-center gap-2">
+    <div className={`w-2 h-[2px] ${color}`} />
+    <span className="text-[8px] font-bold text-slate-500 uppercase">{label}</span>
   </div>
 );
 
