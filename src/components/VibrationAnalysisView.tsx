@@ -32,10 +32,18 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
 
   const latest = data.length > 0 ? data[data.length - 1] : null;
 
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center text-slate-400 uppercase text-[10px] tracking-widest">
+        <Activity className="animate-spin mr-2" size={16} /> A sincronizar telemetria...
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-2 animate-in fade-in duration-500">
-      {/* Header Estilo Glassmorphism */}
-      <div className="bg-white/60 backdrop-blur-md p-8 rounded-[40px] border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Header Limpo e Moderno */}
+      <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-5">
           <div className="bg-indigo-600 p-4 rounded-3xl shadow-lg shadow-indigo-200">
             <Target className="text-white" size={28} />
@@ -46,7 +54,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Telemetry System</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest uppercase">Live Monitoring</span>
             </div>
           </div>
         </div>
@@ -56,7 +64,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
         </div>
       </div>
 
-      {/* Grid de Métricas Visuais */}
+      {/* Grid de Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ModernMetricCard label="Eixo X - Radial" value={latest?.x} color="#3b82f6" />
         <ModernMetricCard label="Eixo Y - Tangencial" value={latest?.y} color="#ef4444" />
@@ -65,14 +73,6 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
 
       {/* Gráfico de Área Moderno */}
       <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-xl shadow-slate-100/50">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">Espectro de Vibração</h3>
-          <div className="flex gap-4">
-             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#3b82f6]" /> <span className="text-[10px] font-bold text-slate-500">X</span></div>
-             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#ef4444]" /> <span className="text-[10px] font-bold text-slate-500">Y</span></div>
-             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#22c55e]" /> <span className="text-[10px] font-bold text-slate-500">Z</span></div>
-          </div>
-        </div>
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
@@ -96,4 +96,8 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
               <Tooltip 
                 contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}
               />
-              <Area type="monotone" dataKey
+              <Legend verticalAlign="top" align="right" iconType="circle" />
+              <Area type="monotone" dataKey="x" name="Eixo X" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorX)" />
+              <Area type="monotone" dataKey="y" name="Eixo Y" stroke="#ef4444" strokeWidth={4} fillOpacity={1} fill="url(#colorY)" />
+              <Area type="monotone" dataKey="z" name="Eixo Z" stroke="#22c55e" strokeWidth={4} fillOpacity={1} fill="url(#colorZ)" />
+            </AreaChart>
