@@ -42,10 +42,6 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
   <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
     {latest.tagName} - Live
   </h2>
-  <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
-    <Activity size={12} className="text-indigo-600 animate-pulse" />
-    Monitorização em Tempo Real
-  </p>
 </div>
 
       {/* Cards de Resumo em Tempo Real */}
