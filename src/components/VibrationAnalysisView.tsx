@@ -39,7 +39,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Cabeçalho da Secção */}
       <div>
-      <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">{assetName} - Análise Triaxial</h2>
+      <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">{latest.tagName} - Análise Triaxial</h2>
         <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
           <Database size={12} className="text-indigo-600" />
           Dados Reais - Sensor WISE-2410
