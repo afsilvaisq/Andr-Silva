@@ -117,7 +117,7 @@ const App: React.FC = () => {
   const [showGateway, setShowGateway] = useState(false);
   const [showCSIImport, setShowCSIImport] = useState(false);
   const [showAddAsset, setShowAddAsset] = useState(false);
-  const [view, setView] = useState<'dashboard' | 'kpi' | 'criticality' | 'matrix' | 'live' | 'reports' | 'balancing' | 'integrations' | 'dimensional' | 'alignment' | 'rdi' | 'thermography' | 'rca' | 'ml' | 'lubrication'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'kpi' | 'criticality' | 'matrix' | 'live' | 'reports' | 'balancing' | 'integrations' | 'dimensional' | 'alignment' | 'rdi' | 'thermography' | 'rca' | 'ml' | 'lubrication' | 'vibration-iot'>('dashboard');
 
   useEffect(() => {
     const assetsRef = ref(db, 'assets');
