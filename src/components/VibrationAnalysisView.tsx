@@ -58,11 +58,6 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
             <Waves size={16} className="text-indigo-600" />
             Linha de Tendência Triaxial
           </h3>
-          <div className="flex items-center gap-2">
-             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-             <span className="text-[9px] text-slate-400 uppercase font-medium">Live do Firebase</span>
-          </div>
-        </div>
 
         <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
