@@ -42,7 +42,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-2 animate-in fade-in duration-500">
-      {/* Header Limpo e Moderno */}
+      {/* Header Estilo Moderno */}
       <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-5">
           <div className="bg-indigo-600 p-4 rounded-3xl shadow-lg shadow-indigo-200">
@@ -54,7 +54,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest uppercase">Live Monitoring</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monitorização Live</span>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
         </div>
       </div>
 
-      {/* Grid de Métricas */}
+      {/* Grid de Métricas Visuais */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ModernMetricCard label="Eixo X - Radial" value={latest?.x} color="#3b82f6" />
         <ModernMetricCard label="Eixo Y - Tangencial" value={latest?.y} color="#ef4444" />
@@ -101,3 +101,32 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
               <Area type="monotone" dataKey="y" name="Eixo Y" stroke="#ef4444" strokeWidth={4} fillOpacity={1} fill="url(#colorY)" />
               <Area type="monotone" dataKey="z" name="Eixo Z" stroke="#22c55e" strokeWidth={4} fillOpacity={1} fill="url(#colorZ)" />
             </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ModernMetricCard = ({ label, value, color }: any) => (
+  <div className="bg-white p-8 rounded-[35px] border border-slate-200 relative overflow-hidden group">
+    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <Zap size={40} style={{ color: color }} />
+    </div>
+    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{label}</p>
+    <div className="flex items-baseline gap-2">
+      <span className="text-5xl font-black tracking-tighter text-slate-900">
+        {value !== undefined ? value.toFixed(2) : '0.00'}
+      </span>
+      <span className="text-xs font-bold text-slate-300 uppercase">mm/s</span>
+    </div>
+    <div className="mt-6 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+      <div 
+        className="h-full transition-all duration-1000 ease-out" 
+        style={{ width: `${Math.min((value || 0) * 10, 100)}%`, backgroundColor: color }}
+      />
+    </div>
+  </div>
+);
+
+export default VibrationAnalysisView;
