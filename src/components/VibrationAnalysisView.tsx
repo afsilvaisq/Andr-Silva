@@ -38,10 +38,17 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Cabeçalho da Secção */}
-     <div>
-  <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
-    {latest.tagName} - Live
-  </h2>
+    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+  <div>
+    <h2 className="text-xl font-extralight text-slate-900 tracking-tight uppercase">
+      {/* Aqui usamos assetName se o Firebase ainda não tiver enviado a tag */}
+      {latest?.tagName || assetName || 'Equipamento'} - Análise Triaxial
+    </h2>
+    <p className="text-slate-400 text-[10px] font-light uppercase tracking-[0.2em] flex items-center gap-2">
+      <Activity size={12} className="text-indigo-600 animate-pulse" />
+      Monitorização Live
+    </p>
+  </div>
 </div>
 
       {/* Cards de Resumo em Tempo Real */}
@@ -78,10 +85,10 @@ const VibrationAnalysisView: React.FC<{ assetName?: string }> = ({ assetName }) 
                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
               />
               <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '11px', textTransform: 'uppercase' }} />
-              
-              <Line type="monotone" dataKey="x" name="Vibração X" stroke="#6366f1" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-              <Line type="monotone" dataKey="y" name="Vibração Y" stroke="#10b981" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-              <Line type="monotone" dataKey="z" name="Vibração Z" stroke="#f59e0b" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+            
+             <Line type="monotone" dataKey="x" name="Eixo X" stroke="#3b82f6" /* Azul */strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+<Line type="monotone" dataKey="y" name="Eixo Y" stroke="#ef4444" /* Vermelho */strokeWidth={2} dot={false} activeDot={{ r: 4 }} 
+<Line type="monotone" dataKey="z" name="Eixo Z" stroke="#22c55e" /* Verde */strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
