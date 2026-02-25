@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Asset, SensorType, UserRole, SensorReading, SeverityLevel, Sensor, DataSource } from './types';
 import AssetCard from './components/AssetCard';
 import ReliabilityDashboard from './components/ReliabilityDashboard';
@@ -308,6 +309,7 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
+        <Analytics />
       </div>
     );
   }
@@ -431,6 +433,7 @@ const App: React.FC = () => {
         {view === 'alignment' && <section className="p-8"><AlignmentView assets={assets} /></section>}
         </div>
       </main>
+      <Analytics />
     </div>
   );
 };
